@@ -1,0 +1,971 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>World Time Difference Clock</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #1a1a2e 0%, #16213e 50%, #0f3460 100%);
+            background-attachment: fixed;
+            min-height: 100vh;
+            color: white;
+            overflow-x: hidden;
+        }
+
+        /* Navigation Bar */
+        nav {
+            background: rgba(255, 255, 255, 0.05);
+            backdrop-filter: blur(10px);
+            padding: 1rem 2rem;
+            box-shadow: 0 4px 30px rgba(0, 0, 0, 0.3);
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+
+        nav ul {
+            list-style: none;
+            display: flex;
+            justify-content: center;
+            gap: 3rem;
+            flex-wrap: wrap;
+        }
+
+        nav ul li a {
+            color: white;
+            text-decoration: none;
+            font-size: 1.1rem;
+            font-weight: 600;
+            transition: all 0.3s ease;
+            padding: 0.5rem 1.5rem;
+            border-radius: 10px;
+            background: rgba(255, 255, 255, 0.05);
+            display: inline-block;
+        }
+
+        nav ul li a:hover, nav ul li a.active {
+            background: rgba(0, 212, 255, 0.2);
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(0, 212, 255, 0.3);
+        }
+
+        /* Landing Page */
+        .landing-page {
+            min-height: calc(100vh - 80px);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding: 4rem 2rem;
+            text-align: center;
+        }
+
+        .landing-content {
+            max-width: 900px;
+        }
+
+        .landing-title {
+            font-size: 5rem;
+            font-weight: 800;
+            background: linear-gradient(135deg, #00d4ff, #7b2ff7, #ff0080);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            margin-bottom: 1.5rem;
+            animation: glow 3s ease-in-out infinite;
+            line-height: 1.2;
+        }
+
+        .landing-subtitle {
+            font-size: 1.8rem;
+            color: rgba(255, 255, 255, 0.8);
+            margin-bottom: 3rem;
+            letter-spacing: 1px;
+        }
+
+        .landing-features {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 2rem;
+            margin-bottom: 3rem;
+        }
+
+        .feature-card {
+            background: rgba(255, 255, 255, 0.05);
+            backdrop-filter: blur(20px);
+            border-radius: 20px;
+            padding: 2rem;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            transition: all 0.3s ease;
+        }
+
+        .feature-card:hover {
+            transform: translateY(-10px);
+            box-shadow: 0 15px 40px rgba(0, 212, 255, 0.3);
+            border-color: rgba(0, 212, 255, 0.5);
+        }
+
+        .feature-icon {
+            font-size: 3rem;
+            margin-bottom: 1rem;
+        }
+
+        .feature-title {
+            font-size: 1.3rem;
+            margin-bottom: 0.5rem;
+            color: #00d4ff;
+        }
+
+        .feature-desc {
+            font-size: 1rem;
+            color: rgba(255, 255, 255, 0.7);
+        }
+
+        .cta-button {
+            display: inline-block;
+            padding: 1.2rem 3rem;
+            font-size: 1.3rem;
+            font-weight: 600;
+            background: linear-gradient(135deg, #00d4ff, #7b2ff7);
+            border: none;
+            border-radius: 50px;
+            color: white;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-decoration: none;
+            box-shadow: 0 10px 30px rgba(0, 212, 255, 0.4);
+        }
+
+        .cta-button:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 15px 40px rgba(0, 212, 255, 0.6);
+        }
+
+        /* Compare Page */
+        .compare-page {
+            display: none;
+            padding: 3rem 2rem;
+            min-height: calc(100vh - 80px);
+        }
+
+        .compare-page.active {
+            display: block;
+        }
+
+        .page-header {
+            text-align: center;
+            margin-bottom: 3rem;
+        }
+
+        .page-title {
+            font-size: 3.5rem;
+            background: linear-gradient(135deg, #00d4ff, #7b2ff7);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            margin-bottom: 1rem;
+        }
+
+        /* Selector Section */
+        .selector-section {
+            max-width: 800px;
+            margin: 0 auto 3rem;
+            animation: fadeInDown 0.8s ease;
+        }
+
+        .search-container {
+            background: rgba(255, 255, 255, 0.05);
+            backdrop-filter: blur(20px);
+            border-radius: 25px;
+            padding: 2.5rem;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .search-label {
+            font-size: 1.3rem;
+            margin-bottom: 1rem;
+            color: rgba(255, 255, 255, 0.9);
+            text-align: center;
+        }
+
+        .search-input {
+            width: 100%;
+            padding: 1.2rem 1.5rem;
+            font-size: 1.2rem;
+            border: 2px solid rgba(0, 212, 255, 0.3);
+            border-radius: 15px;
+            background: rgba(255, 255, 255, 0.1);
+            color: white;
+            outline: none;
+            margin-bottom: 1rem;
+            transition: all 0.3s ease;
+        }
+
+        .search-input::placeholder {
+            color: rgba(255, 255, 255, 0.5);
+        }
+
+        .search-input:focus {
+            border-color: rgba(0, 212, 255, 0.8);
+            box-shadow: 0 0 25px rgba(0, 212, 255, 0.4);
+            background: rgba(255, 255, 255, 0.15);
+        }
+
+        select {
+            width: 100%;
+            padding: 1.2rem 1.5rem;
+            font-size: 1.2rem;
+            border: 2px solid rgba(0, 212, 255, 0.3);
+            border-radius: 15px;
+            background: rgba(255, 255, 255, 0.1);
+            color: white;
+            outline: none;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        select:focus {
+            border-color: rgba(0, 212, 255, 0.8);
+            box-shadow: 0 0 25px rgba(0, 212, 255, 0.4);
+        }
+
+        select option {
+            background: #16213e;
+            color: white;
+            padding: 1rem;
+        }
+
+        /* Clock Comparison Section */
+        .comparison-section {
+            display: none;
+            max-width: 1400px;
+            margin: 0 auto;
+            gap: 2rem;
+            align-items: center;
+            animation: fadeInUp 1s ease;
+        }
+
+        .comparison-section.active {
+            display: flex;
+        }
+
+        /* Wall Clock Container */
+        .clock-box {
+            flex: 1;
+            background: rgba(255, 255, 255, 0.05);
+            backdrop-filter: blur(20px);
+            border-radius: 30px;
+            padding: 3rem;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            text-align: center;
+            min-height: 500px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .clock-label {
+            font-size: 1.8rem;
+            margin-bottom: 2rem;
+            color: rgba(255, 255, 255, 0.9);
+            font-weight: 600;
+        }
+
+        /* Analog Clock */
+        .analog-clock {
+            position: relative;
+            width: 250px;
+            height: 250px;
+            border-radius: 50%;
+            background: rgba(255, 255, 255, 0.05);
+            border: 8px solid rgba(0, 212, 255, 0.3);
+            box-shadow: 0 0 40px rgba(0, 212, 255, 0.4),
+                        inset 0 0 40px rgba(0, 212, 255, 0.2);
+            margin-bottom: 2rem;
+        }
+
+        .clock-center {
+            position: absolute;
+            width: 20px;
+            height: 20px;
+            background: #00d4ff;
+            border-radius: 50%;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            z-index: 10;
+            box-shadow: 0 0 10px #00d4ff;
+        }
+
+        .hand {
+            position: absolute;
+            bottom: 50%;
+            left: 50%;
+            transform-origin: bottom center;
+            background: linear-gradient(to top, #00d4ff, #7b2ff7);
+            border-radius: 10px;
+            box-shadow: 0 0 10px rgba(0, 212, 255, 0.5);
+        }
+
+        .hour-hand {
+            width: 6px;
+            height: 70px;
+            margin-left: -3px;
+        }
+
+        .minute-hand {
+            width: 4px;
+            height: 90px;
+            margin-left: -2px;
+        }
+
+        .second-hand {
+            width: 2px;
+            height: 100px;
+            margin-left: -1px;
+            background: #ff0080;
+            box-shadow: 0 0 10px #ff0080;
+        }
+
+        .clock-numbers {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+        }
+
+        .number {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            text-align: center;
+            font-size: 1.2rem;
+            font-weight: bold;
+            color: rgba(255, 255, 255, 0.7);
+        }
+
+        .number span {
+            display: inline-block;
+            transform: rotate(calc(-30deg * var(--i)));
+        }
+
+        /* Digital Time Display */
+        .digital-time {
+            font-size: 2.5rem;
+            font-weight: 700;
+            color: #00d4ff;
+            text-shadow: 0 0 20px rgba(0, 212, 255, 0.8);
+            margin-bottom: 0.5rem;
+        }
+
+        .date-display {
+            font-size: 1.1rem;
+            color: rgba(255, 255, 255, 0.7);
+        }
+
+        /* Difference Box */
+        .difference-box {
+            flex: 0.8;
+            background: rgba(255, 255, 255, 0.05);
+            backdrop-filter: blur(20px);
+            border-radius: 30px;
+            padding: 3rem;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            text-align: center;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            min-height: 500px;
+        }
+
+        .difference-icon {
+            font-size: 5rem;
+            margin-bottom: 2rem;
+        }
+
+        .difference-text {
+            font-size: 2.5rem;
+            font-weight: 700;
+            background: linear-gradient(135deg, #00d4ff, #ff0080);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            margin-bottom: 1rem;
+            line-height: 1.4;
+        }
+
+        .difference-detail {
+            font-size: 1.3rem;
+            color: rgba(255, 255, 255, 0.8);
+            line-height: 1.8;
+        }
+
+        /* About Page */
+        .about-page {
+            display: none;
+            padding: 3rem 2rem;
+            min-height: calc(100vh - 80px);
+        }
+
+        .about-page.active {
+            display: block;
+        }
+
+        .about-content {
+            max-width: 900px;
+            margin: 0 auto;
+            background: rgba(255, 255, 255, 0.05);
+            backdrop-filter: blur(20px);
+            border-radius: 30px;
+            padding: 3rem;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .about-content h2 {
+            font-size: 2.5rem;
+            margin-bottom: 1.5rem;
+            color: #00d4ff;
+        }
+
+        .about-content p {
+            font-size: 1.2rem;
+            line-height: 1.8;
+            color: rgba(255, 255, 255, 0.8);
+            margin-bottom: 1.5rem;
+        }
+
+        /* Footer */
+        footer {
+            background: rgba(255, 255, 255, 0.05);
+            backdrop-filter: blur(10px);
+            padding: 2rem;
+            text-align: center;
+            border-top: 1px solid rgba(255, 255, 255, 0.1);
+            margin-top: 4rem;
+        }
+
+        footer p {
+            font-size: 1.1rem;
+            color: rgba(255, 255, 255, 0.7);
+        }
+
+        /* Animations */
+        @keyframes fadeInDown {
+            from {
+                opacity: 0;
+                transform: translateY(-30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        @keyframes glow {
+            0%, 100% {
+                text-shadow: 0 0 20px rgba(0, 212, 255, 0.5),
+                             0 0 40px rgba(123, 47, 247, 0.3);
+            }
+            50% {
+                text-shadow: 0 0 30px rgba(0, 212, 255, 0.8),
+                             0 0 60px rgba(123, 47, 247, 0.5);
+            }
+        }
+
+        /* Responsive Design */
+        @media (max-width: 1200px) {
+            .comparison-section {
+                flex-direction: column;
+            }
+
+            .difference-box {
+                order: 3;
+                width: 100%;
+            }
+        }
+
+        @media (max-width: 768px) {
+            .landing-title {
+                font-size: 3rem;
+            }
+
+            .landing-subtitle {
+                font-size: 1.3rem;
+            }
+
+            .page-title {
+                font-size: 2.5rem;
+            }
+
+            .analog-clock {
+                width: 200px;
+                height: 200px;
+            }
+
+            .digital-time {
+                font-size: 2rem;
+            }
+
+            .difference-text {
+                font-size: 1.8rem;
+            }
+
+            nav ul {
+                gap: 1rem;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .landing-title {
+                font-size: 2rem;
+            }
+
+            .clock-box, .difference-box {
+                padding: 2rem 1rem;
+            }
+
+            .analog-clock {
+                width: 180px;
+                height: 180px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <nav>
+        <ul>
+            <li><a href="#" class="nav-link active" data-page="home">🏠 Home</a></li>
+            <li><a href="#" class="nav-link" data-page="compare">🌍 Compare</a></li>
+            <li><a href="#" class="nav-link" data-page="about">ℹ️ About</a></li>
+        </ul>
+    </nav>
+
+    <div class="landing-page" id="homePage">
+        <div class="landing-content">
+            <h1 class="landing-title">🌏 World Time<br>Difference Clock</h1>
+            <p class="landing-subtitle">Experience Time Zones Like Never Before</p>
+            
+            <div class="landing-features">
+                <div class="feature-card">
+                    <div class="feature-icon">⏰</div>
+                    <h3 class="feature-title">Analog & Digital</h3>
+                    <p class="feature-desc">Beautiful wall-style clocks with precise digital time</p>
+                </div>
+                <div class="feature-card">
+                    <div class="feature-icon">🌐</div>
+                    <h3 class="feature-title">Global Coverage</h3>
+                    <p class="feature-desc">Compare time across 35+ countries worldwide</p>
+                </div>
+                <div class="feature-card">
+                    <div class="feature-icon">⚡</div>
+                    <h3 class="feature-title">Real-Time Sync</h3>
+                    <p class="feature-desc">Live updates every second with smooth animations</p>
+                </div>
+            </div>
+
+            <button class="cta-button" onclick="navigateTo('compare')">Start Comparing Times →</button>
+        </div>
+    </div>
+
+    <div class="compare-page" id="comparePage">
+        <div class="page-header">
+            <h1 class="page-title">⏰ Compare Time Zones</h1>
+        </div>
+
+        <div class="selector-section">
+            <div class="search-container">
+                <div class="search-label">🔍 Select a country to compare with India</div>
+                <input type="text" class="search-input" id="searchInput" placeholder="Type to search countries...">
+                <select id="countrySelect">
+                    <option value="">Choose a country</option>
+                </select>
+            </div>
+        </div>
+
+        <div class="comparison-section" id="comparisonSection">
+            <div class="clock-box">
+                <div class="clock-label">🇮🇳 India Standard Time</div>
+                <div class="analog-clock">
+                    <div class="clock-numbers" id="istNumbers"></div>
+                    <div class="hand hour-hand" id="istHourHand"></div>
+                    <div class="hand minute-hand" id="istMinuteHand"></div>
+                    <div class="hand second-hand" id="istSecondHand"></div>
+                    <div class="clock-center"></div>
+                </div>
+                <div class="digital-time" id="istTime">00:00:00</div>
+                <div class="date-display" id="istDate"></div>
+            </div>
+
+            <div class="difference-box">
+                <div class="difference-icon" id="diffIcon">⏱️</div>
+                <div class="difference-text" id="diffText">-</div>
+                <div class="difference-detail" id="diffDetail"></div>
+            </div>
+
+            <div class="clock-box">
+                <div class="clock-label" id="countryLabel">Select Country</div>
+                <div class="analog-clock">
+                    <div class="clock-numbers" id="countryNumbers"></div>
+                    <div class="hand hour-hand" id="countryHourHand"></div>
+                    <div class="hand minute-hand" id="countryMinuteHand"></div>
+                    <div class="hand second-hand" id="countrySecondHand"></div>
+                    <div class="clock-center"></div>
+                </div>
+                <div class="digital-time" id="countryTime">00:00:00</div>
+                <div class="date-display" id="countryDate"></div>
+            </div>
+        </div>
+    </div>
+
+    <div class="about-page" id="aboutPage">
+        <div class="page-header">
+            <h1 class="page-title">ℹ️ About This Project</h1>
+        </div>
+        <div class="about-content">
+            <h2>🌍 Mission</h2>
+            <p>World Time Difference Clock is designed to make understanding time zones simple, beautiful, and intuitive. Whether you're scheduling international meetings, connecting with friends abroad, or just curious about time differences, we've got you covered.</p>
+            
+            <h2>✨ Features</h2>
+            <p>• Beautiful analog wall clocks with smooth animations<br>
+               • Real-time synchronization with global time zones<br>
+               • Easy search and filter functionality<br>
+               • Instant time difference calculations<br>
+               • Responsive design for all devices</p>
+            
+            <h2>🛠️ Technology</h2>
+            <p>Built with modern web technologies including HTML5, CSS3, and JavaScript. Uses the Intl.DateTimeFormat API for accurate timezone handling and stunning glassmorphism design for a premium look.</p>
+        </div>
+    </div>
+
+    <footer>
+        <p>Made with ❤️ | © 2025 World Time Clock</p>
+    </footer>
+
+    <script>
+        const countries = [
+            { name: "United States (New York)", timezone: "America/New_York", flag: "🇺🇸" },
+            { name: "United States (Los Angeles)", timezone: "America/Los_Angeles", flag: "🇺🇸" },
+            { name: "United Kingdom", timezone: "Europe/London", flag: "🇬🇧" },
+            { name: "Japan", timezone: "Asia/Tokyo", flag: "🇯🇵" },
+            { name: "Australia (Sydney)", timezone: "Australia/Sydney", flag: "🇦🇺" },
+            { name: "Germany", timezone: "Europe/Berlin", flag: "🇩🇪" },
+            { name: "France", timezone: "Europe/Paris", flag: "🇫🇷" },
+            { name: "China", timezone: "Asia/Shanghai", flag: "🇨🇳" },
+            { name: "Brazil", timezone: "America/Sao_Paulo", flag: "🇧🇷" },
+            { name: "Canada (Toronto)", timezone: "America/Toronto", flag: "🇨🇦" },
+            { name: "Russia (Moscow)", timezone: "Europe/Moscow", flag: "🇷🇺" },
+            { name: "South Korea", timezone: "Asia/Seoul", flag: "🇰🇷" },
+            { name: "Italy", timezone: "Europe/Rome", flag: "🇮🇹" },
+            { name: "Spain", timezone: "Europe/Madrid", flag: "🇪🇸" },
+            { name: "Mexico", timezone: "America/Mexico_City", flag: "🇲🇽" },
+            { name: "South Africa", timezone: "Africa/Johannesburg", flag: "🇿🇦" },
+            { name: "Singapore", timezone: "Asia/Singapore", flag: "🇸🇬" },
+            { name: "United Arab Emirates", timezone: "Asia/Dubai", flag: "🇦🇪" },
+            { name: "Thailand", timezone: "Asia/Bangkok", flag: "🇹🇭" },
+            { name: "Turkey", timezone: "Europe/Istanbul", flag: "🇹🇷" },
+            { name: "Argentina", timezone: "America/Argentina/Buenos_Aires", flag: "🇦🇷" },
+            { name: "Egypt", timezone: "Africa/Cairo", flag: "🇪🇬" },
+            { name: "Saudi Arabia", timezone: "Asia/Riyadh", flag: "🇸🇦" },
+            { name: "Malaysia", timezone: "Asia/Kuala_Lumpur", flag: "🇲🇾" },
+            { name: "Indonesia (Jakarta)", timezone: "Asia/Jakarta", flag: "🇮🇩" },
+            { name: "Philippines", timezone: "Asia/Manila", flag: "🇵🇭" },
+            { name: "Vietnam", timezone: "Asia/Ho_Chi_Minh", flag: "🇻🇳" },
+            { name: "New Zealand", timezone: "Pacific/Auckland", flag: "🇳🇿" },
+            { name: "Netherlands", timezone: "Europe/Amsterdam", flag: "🇳🇱" },
+            { name: "Switzerland", timezone: "Europe/Zurich", flag: "🇨🇭" },
+            { name: "Sweden", timezone: "Europe/Stockholm", flag: "🇸🇪" },
+            { name: "Norway", timezone: "Europe/Oslo", flag: "🇳🇴" },
+            { name: "Denmark", timezone: "Europe/Copenhagen", flag: "🇩🇰" },
+            { name: "Poland", timezone: "Europe/Warsaw", flag: "🇵🇱" },
+            { name: "Greece", timezone: "Europe/Athens", flag: "🇬🇷" },
+            { name: "Portugal", timezone: "Europe/Lisbon", flag: "🇵🇹" },
+        ];
+
+        const select = document.getElementById('countrySelect');
+        const searchInput = document.getElementById('searchInput');
+        let allOptions = [];
+
+        // Populate dropdown
+        const firstOption = select.options[0];
+        allOptions.push(firstOption); // Store "Choose a country"
+        countries.sort((a, b) => a.name.localeCompare(b.name)); // Sort countries alphabetically
+        countries.forEach(country => {
+            const opt = document.createElement('option');
+            opt.value = country.timezone;
+            opt.textContent = `${country.flag} ${country.name}`;
+            opt.dataset.name = country.name;
+            opt.dataset.flag = country.flag;
+            select.appendChild(opt);
+            allOptions.push(opt); // Store the element for filtering
+        });
+
+        // Navigation
+        function navigateTo(page) {
+            document.querySelectorAll('.landing-page, .compare-page, .about-page').forEach(p => {
+                p.classList.remove('active');
+                if(p.id !== 'homePage') p.style.display = 'none';
+            });
+            document.querySelectorAll('.nav-link').forEach(link => {
+                link.classList.remove('active');
+            });
+
+            if (page === 'home') {
+                document.getElementById('homePage').style.display = 'flex';
+                document.querySelector('[data-page="home"]').classList.add('active');
+            } else if (page === 'compare') {
+                document.getElementById('comparePage').style.display = 'block';
+                document.getElementById('comparePage').classList.add('active');
+                document.querySelector('[data-page="compare"]').classList.add('active');
+            } else if (page === 'about') {
+                document.getElementById('aboutPage').style.display = 'block';
+                document.getElementById('aboutPage').classList.add('active');
+                document.querySelector('[data-page="about"]').classList.add('active');
+            }
+        }
+
+        document.querySelectorAll('.nav-link').forEach(link => {
+            link.addEventListener('click', (e) => {
+                e.preventDefault();
+                const page = e.target.dataset.page;
+                if (page === 'home') {
+                    document.getElementById('homePage').style.display = 'flex';
+                    document.getElementById('comparePage').classList.remove('active');
+                    document.getElementById('comparePage').style.display = 'none';
+                    document.getElementById('aboutPage').classList.remove('active');
+                    document.getElementById('aboutPage').style.display = 'none';
+                } else {
+                    document.getElementById('homePage').style.display = 'none';
+                    navigateTo(page);
+                }
+                document.querySelectorAll('.nav-link').forEach(l => l.classList.remove('active'));
+                e.target.classList.add('active');
+            });
+        });
+
+        // Create clock numbers
+        function createClockNumbers(containerId) {
+            const container = document.getElementById(containerId);
+            if (!container) return;
+            for (let i = 1; i <= 12; i++) {
+                const number = document.createElement('div');
+                number.className = 'number';
+                number.style.transform = `rotate(${30 * i}deg)`;
+                const span = document.createElement('span');
+                span.textContent = i;
+                span.style.setProperty('--i', i);
+                number.appendChild(span);
+                container.appendChild(number);
+            }
+        }
+
+        createClockNumbers('istNumbers');
+        createClockNumbers('countryNumbers');
+
+        // Update clock hands
+        function updateClock(timezone, hourId, minuteId, secondId, timeId, dateId) {
+            const now = new Date();
+            
+            const timeStr = new Intl.DateTimeFormat('en-US', {
+                timeZone: timezone,
+                hour: '2-digit',
+                minute: '2-digit',
+                second: '2-digit',
+                hour12: false
+            }).format(now);
+
+            const dateStr = new Intl.DateTimeFormat('en-US', {
+                timeZone: timezone,
+                weekday: 'short',
+                month: 'short',
+                day: 'numeric',
+                year: 'numeric'
+            }).format(now);
+
+            document.getElementById(timeId).textContent = timeStr;
+            document.getElementById(dateId).textContent = dateStr;
+
+            // Analog clock logic
+            const [hours, minutes, seconds] = timeStr.split(':').map(Number);
+            const hours12 = hours % 12;
+
+            // Add 180deg because the hands start pointing down (due to `bottom: 50%`)
+            const secondsDeg = (seconds / 60) * 360;
+            const minutesDeg = (minutes / 60) * 360 + (seconds / 60) * 6;
+            const hoursDeg = (hours12 / 12) * 360 + (minutes / 60) * 30;
+
+            document.getElementById(secondId).style.transform = `rotate(${secondsDeg}deg)`;
+            document.getElementById(minuteId).style.transform = `rotate(${minutesDeg}deg)`;
+            document.getElementById(hourId).style.transform = `rotate(${hoursDeg}deg)`;
+        }
+
+        // --- New Functions Added ---
+
+        /**
+         * Parses a GMT offset string (e.g., "GMT+5:30" or "GMT-4") into a number (e.g., 5.5 or -4).
+         */
+        function parseOffset(offsetStr) {
+            if (!offsetStr || !offsetStr.includes('GMT')) return 0;
+            
+            const parts = offsetStr.replace('GMT', '').split(':');
+            const hours = parseInt(parts[0], 10);
+            const minutes = parts[1] ? parseInt(parts[1], 10) : 0;
+            
+            // Apply the sign of the hours to the minutes
+            const totalHours = hours + (minutes / 60) * (hours < 0 ? -1 : 1);
+            return totalHours;
+        }
+
+        /**
+         * Calculates and displays the time difference between IST and the selected country.
+         */
+        function updateDifference(countryTimezone, countryName) {
+            const now = new Date();
+            const istTimezone = 'Asia/Kolkata';
+
+            // Get IST offset string
+            const istParts = new Intl.DateTimeFormat('en', {
+                timeZone: istTimezone,
+                timeZoneName: 'longOffset'
+            }).formatToParts(now);
+            const istOffsetStr = istParts.find(p => p.type === 'timeZoneName')?.value || "GMT+5:30"; // Fallback
+
+            // Get Country offset string
+            const countryParts = new Intl.DateTimeFormat('en', {
+                timeZone: countryTimezone,
+                timeZoneName: 'longOffset'
+            }).formatToParts(now);
+            const countryOffsetStr = countryParts.find(p => p.type === 'timeZoneName')?.value;
+            
+            if (!countryOffsetStr) {
+                document.getElementById('diffText').textContent = "Error";
+                document.getElementById('diffDetail').textContent = "Could not get timezone data.";
+                return;
+            }
+
+            const istOffset = parseOffset(istOffsetStr); // e.g., 5.5
+            const countryOffset = parseOffset(countryOffsetStr); // e.g., -4
+            
+            const diff = istOffset - countryOffset; // e.g., 5.5 - (-4) = 9.5
+
+            const diffHours = Math.floor(Math.abs(diff));
+            const diffMinutes = Math.round((Math.abs(diff) % 1) * 60);
+
+            let diffString = `${diffHours} ${diffHours === 1 ? 'hour' : 'hours'}`;
+            if (diffMinutes > 0) {
+                diffString += ` ${diffMinutes} ${diffMinutes === 1 ? 'minute' : 'minutes'}`;
+            }
+
+            let detailString = '';
+            let diffIcon = '⏱️';
+            let diffText = diffString;
+
+            if (Math.abs(diff) < 0.01) { // Check for same timezone
+                detailString = `India and ${countryName} share the same time.`;
+                diffIcon = '🤝';
+                diffText = "0 hours";
+            } else if (diff > 0) { // IST is ahead
+                detailString = `India is <strong>${diffString}</strong> ahead of ${countryName}.`;
+                diffIcon = '🇮🇳 ➡️';
+            } else { // IST is behind
+                detailString = `India is <strong>${diffString}</strong> behind ${countryName}.`;
+                diffIcon = '⬅️ 🇮🇳';
+            }
+
+            document.getElementById('diffText').innerHTML = diffText;
+            document.getElementById('diffDetail').innerHTML = detailString;
+            document.getElementById('diffIcon').textContent = diffIcon;
+        }
+
+        // Search/Filter Logic
+        searchInput.addEventListener('input', () => {
+            const filter = searchInput.value.toLowerCase();
+            
+            // Detach all options except the first ("Choose a country")
+            const optionsToFilter = allOptions.slice(1);
+            optionsToFilter.forEach(opt => opt.remove());
+
+            // Add back the ones that match
+            optionsToFilter.forEach(opt => {
+                if (opt.dataset.name.toLowerCase().includes(filter)) {
+                    select.appendChild(opt);
+                }
+            });
+        });
+
+        // Country Selection Logic
+        select.addEventListener('change', () => {
+            const selectedOption = select.options[select.selectedIndex];
+            
+            if (!selectedOption.value) {
+                // Hide comparison if "Choose a country" is selected
+                document.getElementById('comparisonSection').classList.remove('active');
+                selectedCountryTimezone = null;
+                return;
+            }
+
+            const selectedTimezone = selectedOption.value;
+            const selectedName = selectedOption.dataset.name;
+            const selectedFlag = selectedOption.dataset.flag;
+            
+            // Update the label
+            document.getElementById('countryLabel').textContent = `${selectedFlag} ${selectedName}`;
+            
+            // Run one update immediately to set the clock
+            updateClock(selectedTimezone, 'countryHourHand', 'countryMinuteHand', 'countrySecondHand', 'countryTime', 'countryDate');
+            
+            // Calculate and display the difference
+            updateDifference(selectedTimezone, selectedName);
+
+            // Show the comparison section
+            document.getElementById('comparisonSection').classList.add('active');
+        });
+        
+        let selectedCountryTimezone = null; // To keep track of the selected zone for the interval
+        
+        // Add listener to update the global variable
+        select.addEventListener('change', () => {
+             selectedCountryTimezone = select.value;
+        });
+
+        // Main Clock Tick Interval
+        setInterval(() => {
+            // Always update IST clock
+            updateClock('Asia/Kolkata', 'istHourHand', 'istMinuteHand', 'istSecondHand', 'istTime', 'istDate');
+            
+            // Update selected country clock only if one is selected
+            if (selectedCountryTimezone) {
+                updateClock(selectedCountryTimezone, 'countryHourHand', 'countryMinuteHand', 'countrySecondHand', 'countryTime', 'countryDate');
+            }
+        }, 1000);
+
+        // Initial Call for IST clock on page load
+        updateClock('Asia/Kolkata', 'istHourHand', 'istMinuteHand', 'istSecondHand', 'istTime', 'istDate');
+
+    </script>
+</body>
+</html>
